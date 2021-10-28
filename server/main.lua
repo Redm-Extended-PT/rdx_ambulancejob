@@ -78,7 +78,7 @@ if Config.EarlyRespawn and Config.EarlyRespawnFine then
 
 	RDX.RegisterServerCallback('rdx_ambulancejob:payFine', function(source, cb)
 		local xPlayer = RDX.GetPlayerFromId(source)
-		TriggerClientEvent('rdx:showNotification', xPlayer.source, _U('respawn_fine', Config.EarlyRespawnFineAmount))
+		TriggerClientEvent('rdx_notification:start', xPlayer.source, _U('respawn_fine', Config.EarlyRespawnFineAmount))
 		xPlayer.removeAccountMoney('bank', Config.EarlyRespawnFineAmount)
 
 		cb()
@@ -100,9 +100,9 @@ AddEventHandler('rdx_ambulancejob:removeItem', function(item)
 	xPlayer.removeInventoryItem(item, 1)
 
 	if item == 'bandage' then
-		TriggerClientEvent('rdx:showNotification', _source, _U('used_bandage'))
+		TriggerClientEvent('rdx_notification:start', _source, _U('used_bandage'))
 	elseif item == 'medikit' then
-		TriggerClientEvent('rdx:showNotification', _source, _U('used_medikit'))
+		TriggerClientEvent('rdx_notification:start', _source, _U('used_medikit'))
 	end
 end)
 
@@ -130,7 +130,7 @@ RDX.RegisterUsableItem('medikit', function(source)
 	local xPlayer = RDX.GetPlayerFromId(_source)
 	xPlayer.removeInventoryItem('medikit', 1)
 	TriggerClientEvent('rdx_ambulancejob:heal', _source, 'big')
-	TriggerClientEvent('rdx:showNotification', _source, _U('used_medikit'))
+	TriggerClientEvent('rdx_notification:start', _source, _U('used_medikit'))
 end)
 
 RDX.RegisterUsableItem('bandage', function(source)
@@ -138,7 +138,7 @@ RDX.RegisterUsableItem('bandage', function(source)
 	local xPlayer = RDX.GetPlayerFromId(_source)
 	xPlayer.removeInventoryItem('bandage', 1)
 	TriggerClientEvent('rdx_ambulancejob:heal', _source, 'small')
-	TriggerClientEvent('rdx:showNotification', _source, _U('used_bandage'))
+	TriggerClientEvent('rdx_notification:start', _source, _U('used_bandage'))
 end)
 
 RegisterServerEvent('rdx_ambulancejob:firstSpawn')
