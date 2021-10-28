@@ -8,7 +8,7 @@ Config.RespawnTime = 30000
 local second = 1000
 local minute = 60 * second
 
-Config.ShowDeathTimer = true
+Config.ShowDeathTimer = true --dont tuch
 Config.EarlyRespawnTimer          = 1 * minute  -- Time til respawn is available 7
 Config.BleedoutTimer              = 1 * minute -- Time til the player bleeds out 5
 Config.EnableArmoryManagement 		= true
@@ -19,6 +19,8 @@ Config.RemoveItemsAfterRPDeath      = true
 Config.EarlyRespawn                 = true
 Config.EarlyRespawnFine                  = true
 Config.EarlyRespawnFineAmount            = 50
+
+Config.RespawnPoint = {coords = vector3(-282.67, 815.17, 119.04), heading = 354.17}
 
 Config.Zones = {
 
