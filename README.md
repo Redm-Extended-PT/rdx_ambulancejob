@@ -1,6 +1,7 @@
 # rdx_ambulancejob
 A Medic Job for rdx_core
-![RedM Extended](https://cdn.discordapp.com/attachments/842208552927100938/882606015185584148/medico.png)
+![rdx_ambulancejob](https://cdn.discordapp.com/attachments/842208552927100938/882606015185584148/medico.png)
+- [RDX Framework Discord](https://discord.gg/VkhUUGHpNs)
 
 [INSTALLATION]
 
