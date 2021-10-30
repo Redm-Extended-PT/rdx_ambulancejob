@@ -33,8 +33,8 @@ Locales['pt'] = {
   ['open_pharmacy'] = 'Aperte ~INPUT_CONTEXT~ para abrir a farmácia.',
   ['pharmacy_menu_title'] = 'Farmácia',
   ['pharmacy_take'] = 'Retirar',
-  ['medikit'] = 'Medic Kit',
-  ['bandage'] = 'Bandagem',
+  ['medikit'] = 'Kit Medico',
+  ['bandage'] = 'Ligadura',
   ['max_item'] = 'você já carrega o suficiente sobre você.',
   -- F6 Menu
   ['ems_menu'] = 'Interação com cidadão',
@@ -60,10 +60,10 @@ Locales['pt'] = {
   ['distress_message'] = 'atenção médica necessária: cidadão inconsciente!',
   ['distress_sent'] = 'sinal de socorro foi enviado para as unidades disponíveis!',
   -- Item
-  ['used_medikit'] = 'você usou 1x Seringa',
-  ['used_bandage'] = 'você usou 1x Vendagem',
-  ['not_enough_medikit'] = 'Você não tem ~b~Seringa~w~.',
-  ['not_enough_bandage'] = 'Você não tem ~b~Vendagem~w~.',
+  ['used_medikit'] = 'você usou 1x KitMedico',
+  ['used_bandage'] = 'você usou 1x Ligadura',
+  ['not_enough_medikit'] = 'Você não tem ~b~KitMedico~w~.',
+  ['not_enough_bandage'] = 'Você não tem ~b~Ligadura~w~.',
   ['healed'] = 'Você foi tratado.',
   -- Misc
 }
