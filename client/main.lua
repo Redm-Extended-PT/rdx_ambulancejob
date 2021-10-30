@@ -69,7 +69,7 @@ function ShowDeathTimer()
 			respawnTimer = respawnTimer - 15
 		end
 		Citizen.Wait(0)
-			RemoveItemsAfterRPDeath()
+			StartRespawnToHospitalMenuTimer()
 	end)
 end
 
@@ -80,6 +80,26 @@ function DrawTxt(text,x,y)
     SetTextDropshadow(1,0,0,0,200)
     SetTextFontForCurrentCommand(7)
     DisplayText(CreateVarString(10, "LITERAL_STRING", text), x, y)
+end
+
+function StartRespawnToHospitalMenuTimer()
+    local respawnTimer = Config.EarlyRespawnTimer
+		if respawnTimer > 0 and IsDead then
+			RDX.UI.Menu.Open('default', GetCurrentResourceName(), 'respawn_hospital',
+			{
+				title = _U('respawn_at_hospital'),
+				align = 'bottom-right',
+				elements = {
+					{label = _U('no'),  value = 'no'},
+					{label = _U('yes'), value = 'yes'}
+				}
+			}, function(data, menu)
+				if data.current.value == 'yes' then
+					RemoveItemsAfterRPDeath()
+				end
+				menu.close()
+			end)
+		end
 end
 
 function RemoveItemsAfterRPDeath()
