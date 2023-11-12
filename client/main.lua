@@ -1,6 +1,6 @@
 local FirstSpawn, IsBusy = true, false
 
-IsDead = false
+isDead = false
 RDX = nil
 
 Citizen.CreateThread(function()
@@ -25,7 +25,7 @@ RegisterNetEvent('rdx:onPlayerLogout')
 AddEventHandler('rdx:onPlayerLogout', function()
 	RDX.PlayerLoaded = false
 	RDX.PlayerData = {}
-	firstSpawn = true
+	FirstSpawn = true
 end)
 
 RegisterNetEvent('rdx:setJob')
@@ -33,31 +33,81 @@ AddEventHandler('rdx:setJob', function(job)
 	RDX.PlayerData.job = job
 end)
 
+function SetAttributeCoreValue(ped, coreIndex, value)
+    Citizen.InvokeNative(0xC6258F41D86676E0, ped, coreIndex, value)
+end
+
+function setStamina(value)
+    if value > 100 then
+        value = 100
+    end
+    SetAttributeCoreValue(PlayerPedId(), 1, value)
+end
+
+function restoreStamina()
+    RestorePlayerStamina(PlayerId(), 1.0) --outer
+    setStamina(100) -- inner core
+end
+
+function setPlayerHealth(value)
+    -- Overpower should be disable to make entity health work (edit: ??? not sure now if needed)
+    Citizen.InvokeNative(0xF6A7C08DF2E28B28, PlayerPedId(), 0, 0.0, true) -- EnableAttributeOverpower
+    -- Core should be set to 100 
+    SetAttributeCoreValue(PlayerPedId(), 0, 100)
+    SetEntityHealth(PlayerPedId(), value)
+end
+
+function setPlayerMaxHealth(value)
+    value = value - 550
+    SetEntityMaxHealth(PlayerPedId(), value)
+end
+
+function getPlayerMaxHealth()
+    return GetEntityMaxHealth(PlayerPedId())
+end
+
+function getPlayerHealth()
+    return GetEntityHealth(PlayerPedId())
+end
+
+function restoreHealth()
+    setPlayerHealth(getPlayerMaxHealth())
+end
+
 AddEventHandler('playerSpawned', function()
-	IsDead = false
+	isDead = false
 
 	if FirstSpawn then
 		TriggerServerEvent('rdx_ambulancejob:firstSpawn')
 		exports.spawnmanager:setAutoSpawn(false) -- disable respawn
+		SetPlayerInvincible(ped, false)
+		ClearPedBloodDamage(ped)
+		ClearPedSecondaryTask(playerPed)
+		SetEnableHandcuffs(playerPed, false)
+		DisablePlayerFiring(playerPed, false)
+		SetPedCanPlayGestureAnims(playerPed, true)
+		FreezeEntityPosition(playerPed, false)
+		DisplayRadar(true)
+		restoreHealth()
+                restoreStamina()
 		FirstSpawn = false
 	end
 end)
 
 function OnPlayerDeath()
-	IsDead = true
-	TriggerServerEvent('rdx_ambulancejob:setDeathStatus', 1)
+    isDead = true
+    TriggerServerEvent('rdx_ambulancejob:setDeathStatus',true)
     if Config.ShowDeathTimer == true then
-		ShowDeathTimer()
-	end
-	
-	ClearPedTasksImmediately(PlayerPedId())
+       ShowDeathTimer()
+    end	
+    ClearPedTasksImmediately(PlayerPedId())
 end
 
 function ShowDeathTimer()
 	local respawnTimer = Config.EarlyRespawnTimer
 	print(respawnTimer)
 	Citizen.CreateThread(function()
-		while respawnTimer > 0 and IsDead do
+		while respawnTimer > 0 and isDead do
 			Citizen.Wait(0)
 
 			raw_seconds = respawnTimer/1000
@@ -84,7 +134,7 @@ end
 
 function StartRespawnToHospitalMenuTimer()
     local respawnTimer = Config.EarlyRespawnTimer
-		if respawnTimer > 0 and IsDead then
+		if respawnTimer > 0 and isDead then
 			RDX.UI.Menu.Open('default', GetCurrentResourceName(), 'respawn_hospital',
 			{
 				title = _U('respawn_at_hospital'),
@@ -103,7 +153,7 @@ function StartRespawnToHospitalMenuTimer()
 end
 
 function RemoveItemsAfterRPDeath()
-	TriggerServerEvent('rdx_ambulancejob:setDeathStatus', 0)
+	TriggerServerEvent('rdx_ambulancejob:setDeathStatus',false)
 
 	Citizen.CreateThread(function()
 		DoScreenFadeOut(800)
@@ -127,9 +177,10 @@ end
 
 RegisterCommand("kill", function(source, args, rawCommand) -- KILL YOURSELF COMMAND
     local _source = source
-        local pl = Citizen.InvokeNative(0x217E9DC48139933D)
-        local ped = Citizen.InvokeNative(0x275F255ED201B937, pl)
-     Citizen.InvokeNative(0x697157CED63F18D4, ped, 500000, false, true, true)
+    local pl = Citizen.InvokeNative(0x217E9DC48139933D)
+    local ped = Citizen.InvokeNative(0x275F255ED201B937, pl)
+    Citizen.InvokeNative(0x697157CED63F18D4, ped, 500000, false, true, true)
+    TriggerServerEvent('rdx_ambulancejob:setDeathStatus',true)
 end)
 
 function RespawnPed(ped, coords)
@@ -144,6 +195,8 @@ function RespawnPed(ped, coords)
 	SetPedCanPlayGestureAnims(playerPed, true)
 	FreezeEntityPosition(playerPed, false)
 	DisplayRadar(true)
+	restoreHealth()
+        restoreStamina()
 	RDX.UI.Menu.CloseAll()
 end
 
@@ -169,7 +222,7 @@ RegisterNetEvent('rdx_ambulancejob:revive')
 AddEventHandler('rdx_ambulancejob:revive', function()
 	local playerPed = PlayerPedId()
 	local coords	= GetEntityCoords(playerPed)
-	TriggerServerEvent('rdx_ambulancejob:setDeathStatus', 0)
+	TriggerServerEvent('rdx_ambulancejob:setDeathStatus', false)
 
 	Citizen.CreateThread(function()
 		DoScreenFadeOut(800)
