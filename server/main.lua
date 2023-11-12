@@ -108,18 +108,18 @@ end)
 
 RegisterServerEvent('rdx_ambulancejob:giveItem')
 AddEventHandler('rdx_ambulancejob:giveItem', function(itemName)
-	local _source = source
+    local _source = source
     local xPlayer = RDX.GetPlayerFromId(_source)
-		  xPlayer.addInventoryItem("medikit", 1)
+	  xPlayer.addInventoryItem("medikit", 1)
 end)
 
 RDX.RegisterCommand('revive', 'admin', function(source, args)
 	if args[1] ~= nil then
-		if GetPlayerName(tonumber(args[1])) ~= nil then
-			TriggerClientEvent('rdx_ambulancejob:revive', tonumber(args[1]))
-		end
+	if GetPlayerName(tonumber(args[1])) ~= nil then
+	   TriggerClientEvent('rdx_ambulancejob:revive', tonumber(args[1]))
+	end
 	else
-		TriggerClientEvent('rdx_ambulancejob:revive', source)
+	   TriggerClientEvent('rdx_ambulancejob:revive', source)
 	end
 end, function(source, args)
 	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM', 'Insufficient Permissions.' } })
@@ -143,25 +143,27 @@ end)
 
 RegisterServerEvent('rdx_ambulancejob:firstSpawn')
 AddEventHandler('rdx_ambulancejob:firstSpawn', function()
-	local _source    = source
-	local identifier = GetPlayerIdentifiers(_source)[1]
-	MySQL.Async.fetchScalar('SELECT isDead FROM users WHERE identifier=@identifier',
-	{
-		['@identifier'] = identifier
+    local _source = source
+    local xPlayer = RDX.GetPlayerFromId(_source)
+
+	MySQL.Async.fetchScalar('SELECT isDead FROM users WHERE identifier = @identifier', {
+		['@identifier'] = xPlayer.identifier
 	}, function(isDead)
-		if isDead == 1 then
-			print('rdx_ambulancejob: ' .. GetPlayerName(_source) .. ' (' .. identifier .. ') attempted combat logging!')
+		if isDead then
+			print(('[rdx_ambulancejob] [^2INFO^7] "%s" attempted combat logging'):format(xPlayer.identifier))
 			TriggerClientEvent('rdx_ambulancejob:requestDeath', _source)
 		end
 	end)
 end)
 
-RegisterServerEvent('rdx_ambulancejob:setDeathStatus')
+RegisterNetEvent('rdx_ambulancejob:setDeathStatus')
 AddEventHandler('rdx_ambulancejob:setDeathStatus', function(isDead)
-	local _source = source
-	MySQL.Sync.execute("UPDATE users SET isDead=@isDead WHERE identifier=@identifier",
-	{
-		['@identifier'] = GetPlayerIdentifiers(_source)[1],
-		['@isDead'] = isDead
-	})
+	local xPlayer = RDX.GetPlayerFromId(source)
+
+	if type(isDead) == 'boolean' then
+		MySQL.Sync.execute('UPDATE users SET isDead = @isDead WHERE identifier = @identifier', {
+			['@identifier'] = xPlayer.identifier,
+			['@isDead'] = isDead
+		})
+	end
 end)
